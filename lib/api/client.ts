@@ -97,10 +97,19 @@ apiClient.interceptors.response.use(
 );
 
 // Generic API 함수
+const isApiResponse = <T>(value: unknown): value is ApiResponse<T> => {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'success' in (value as Record<string, unknown>) &&
+    'data' in (value as Record<string, unknown>)
+  );
+};
+
 export async function apiGet<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
   const response = await apiClient.get<ApiResponse<T> | T>(url, config);
-  if (response && typeof response === 'object' && 'success' in response) {
-    return (response as ApiResponse<T>).data;
+  if (isApiResponse<T>(response)) {
+    return response.data;
   }
   return response as T;
 }
@@ -111,8 +120,8 @@ export async function apiPost<T>(
   config?: AxiosRequestConfig
 ): Promise<T> {
   const response = await apiClient.post<ApiResponse<T> | T>(url, data, config);
-  if (response && typeof response === 'object' && 'success' in response) {
-    return (response as ApiResponse<T>).data;
+  if (isApiResponse<T>(response)) {
+    return response.data;
   }
   return response as T;
 }
@@ -123,8 +132,8 @@ export async function apiPut<T>(
   config?: AxiosRequestConfig
 ): Promise<T> {
   const response = await apiClient.put<ApiResponse<T> | T>(url, data, config);
-  if (response && typeof response === 'object' && 'success' in response) {
-    return (response as ApiResponse<T>).data;
+  if (isApiResponse<T>(response)) {
+    return response.data;
   }
   return response as T;
 }
@@ -135,16 +144,16 @@ export async function apiPatch<T>(
   config?: AxiosRequestConfig
 ): Promise<T> {
   const response = await apiClient.patch<ApiResponse<T> | T>(url, data, config);
-  if (response && typeof response === 'object' && 'success' in response) {
-    return (response as ApiResponse<T>).data;
+  if (isApiResponse<T>(response)) {
+    return response.data;
   }
   return response as T;
 }
 
 export async function apiDelete<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
   const response = await apiClient.delete<ApiResponse<T> | T>(url, config);
-  if (response && typeof response === 'object' && 'success' in response) {
-    return (response as ApiResponse<T>).data;
+  if (isApiResponse<T>(response)) {
+    return response.data;
   }
   return response as T;
 }
