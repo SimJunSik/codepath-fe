@@ -7,3 +7,4 @@ export * as problemsApi from './problems';
 export * as projectsApi from './projects';
 export * as dashboardApi from './dashboard';
 export * as usersApi from './users';
+export * as adminApi from './admin';
