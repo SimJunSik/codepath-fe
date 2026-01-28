@@ -125,7 +125,7 @@ export default function CodeEditor({
         <Editor
           height="100%"
           language="python"
-          theme={theme === 'dark' ? 'vs-dark' : 'light'}
+          theme={theme}
           value={code || initialCode}
           onChange={handleEditorChange}
           options={{
