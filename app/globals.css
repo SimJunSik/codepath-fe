@@ -1,0 +1,138 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* CodePath Frontend - Global Styles (다크 모드 기본) */
+
+@layer base {
+  * {
+    @apply antialiased;
+  }
+
+  html {
+    background-color: #0A0A0A;
+  }
+
+  body {
+    @apply font-sans;
+    color: #FAFAFA;
+    background-color: #111111;
+  }
+
+  h1 {
+    @apply text-h1;
+    color: #FAFAFA;
+  }
+
+  h2 {
+    @apply text-h2;
+    color: #FAFAFA;
+  }
+
+  h3 {
+    @apply text-h3;
+    color: #FAFAFA;
+  }
+
+  p {
+    @apply text-body;
+    color: #A0A0A0;
+  }
+
+  a {
+    @apply transition-colors duration-200;
+    color: #FAFAFA;
+  }
+
+  a:hover {
+    color: #E5E5E5;
+  }
+
+  /* 인라인 코드 */
+  code {
+    @apply font-mono text-mono px-1.5 py-0.5 rounded;
+    background-color: #1A1A1A;
+    color: #FAFAFA;
+  }
+
+  /* 코드 블록 */
+  pre {
+    @apply font-mono text-mono p-4 rounded-lg overflow-x-auto;
+    background-color: #1A1A1A;
+    color: #FAFAFA;
+    border: 1px solid #2A2A2A;
+  }
+
+  pre code {
+    @apply p-0;
+    background-color: transparent;
+  }
+}
+
+@layer components {
+  /* Container */
+  .container {
+    @apply mx-auto px-6 max-w-7xl;
+  }
+
+  /* Focus Visible (다크 모드용) */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-offset-2 rounded;
+    --tw-ring-color: #FAFAFA;
+    --tw-ring-offset-color: #111111;
+  }
+
+  /* Screen Reader Only */
+  .sr-only {
+    @apply absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0;
+    clip: rect(0, 0, 0, 0);
+  }
+
+  .sr-only-focusable {
+    @apply absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0;
+    clip: rect(0, 0, 0, 0);
+  }
+
+  .sr-only-focusable:focus {
+    @apply static w-auto h-auto p-3 m-0 overflow-visible whitespace-normal bg-bg-elevated text-text-primary border-0 z-50;
+    clip: auto;
+  }
+
+  /* Card Hover Effect */
+  .card-hover {
+    @apply transition-all duration-200;
+  }
+
+  .card-hover:hover {
+    @apply transform -translate-y-0.5 shadow-elevation-2;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .active\:scale-98:active {
+    transform: scale(0.98);
+  }
+
+  /* 스크롤바 스타일 (다크 모드) */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background-color: #111111;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply rounded-full;
+    background-color: #2A2A2A;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background-color: #3A3A3A;
+  }
+}
