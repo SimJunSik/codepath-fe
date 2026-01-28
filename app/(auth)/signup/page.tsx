@@ -18,6 +18,7 @@ export default function SignupPage() {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
+    confirmPassword: '',
     username: '',
     displayName: '',
   });
@@ -40,6 +41,9 @@ export default function SignupPage() {
       newErrors.password = '비밀번호에 소문자를 포함해주세요';
     } else if (!/[0-9]/.test(formData.password)) {
       newErrors.password = '비밀번호에 숫자를 포함해주세요';
+    }
+    if (formData.confirmPassword !== formData.password) {
+      newErrors.confirmPassword = '비밀번호가 일치하지 않습니다';
     }
 
     if (formData.username.length < 4) {
@@ -70,7 +74,12 @@ export default function SignupPage() {
     setLoading(true);
 
     try {
-      const response = await signup(formData);
+      const response = await signup({
+        email: formData.email,
+        password: formData.password,
+        username: formData.username,
+        displayName: formData.displayName,
+      });
       setAuth(response.user, response.accessToken);
 
       // localStorage에 refreshToken 저장
@@ -138,6 +147,16 @@ export default function SignupPage() {
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               error={errors.password}
               helperText="영문, 숫자, 특수문자 포함 8자 이상"
+              required
+            />
+
+            <Input
+              type="password"
+              label="비밀번호 재확인"
+              placeholder="비밀번호를 다시 입력하세요"
+              value={formData.confirmPassword}
+              onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+              error={errors.confirmPassword}
               required
             />
 
