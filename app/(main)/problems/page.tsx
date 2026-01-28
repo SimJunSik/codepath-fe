@@ -132,8 +132,8 @@ export default function ProblemsPage() {
 
       try {
         const response = await getProblems({ pageSize: 100 });
-        if (response && response.problems) {
-          setProblems(response.problems.map((p: any) => ({
+        if (response && Array.isArray(response.data)) {
+          setProblems(response.data.map((p: any) => ({
             ...p,
             id: p.id.toString(),
           })));
