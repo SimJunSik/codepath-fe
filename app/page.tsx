@@ -96,12 +96,15 @@ export default function LandingPage() {
               © 2026 CodePath
             </div>
             <div className="flex items-center gap-6">
-              <a href="#" className="text-text-tertiary hover:text-text-secondary transition-colors text-caption">
+              <Link href="/about" className="text-text-tertiary hover:text-text-secondary transition-colors text-caption">
+                서비스 소개
+              </Link>
+              <Link href="/terms" className="text-text-tertiary hover:text-text-secondary transition-colors text-caption">
                 이용약관
-              </a>
-              <a href="#" className="text-text-tertiary hover:text-text-secondary transition-colors text-caption">
+              </Link>
+              <Link href="/privacy" className="text-text-tertiary hover:text-text-secondary transition-colors text-caption">
                 개인정보처리방침
-              </a>
+              </Link>
             </div>
           </div>
         </div>
