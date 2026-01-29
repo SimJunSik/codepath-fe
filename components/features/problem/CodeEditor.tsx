@@ -12,12 +12,16 @@ interface CodeEditorProps {
   initialCode?: string;
   onRun?: (code: string) => void | Promise<void>;
   onSubmit?: (code: string) => void | Promise<void>;
+  submitDisabled?: boolean;
+  submitLabel?: string;
 }
 
 export default function CodeEditor({
   initialCode = '',
   onRun,
   onSubmit,
+  submitDisabled = false,
+  submitLabel = '제출하기',
 }: CodeEditorProps) {
   const { code, language, theme, fontSize, setCode, setLanguage, setFontSize, resetEditor } =
     useEditorStore();
@@ -157,9 +161,9 @@ export default function CodeEditor({
           size="sm"
           variant="primary"
           onClick={handleSubmit}
-          disabled={!code}
+          disabled={!code || submitDisabled}
         >
-          제출하기
+          {submitLabel}
         </Button>
         <div className="ml-auto text-xs text-text-tertiary">
           {code.length} characters

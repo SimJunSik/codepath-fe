@@ -430,6 +430,7 @@ export default function QuizDetailPage() {
   const [submitResult, setSubmitResult] = useState<CodeSubmitResult | null>(null);
   const [executionError, setExecutionError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [rateLimitCountdown, setRateLimitCountdown] = useState<number | null>(null);
 
   const isUuid = (value: string) =>
     /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
@@ -513,6 +514,11 @@ export default function QuizDetailPage() {
       return;
     }
 
+    // Rate limit 카운트다운 중이면 제출 막기
+    if (rateLimitCountdown !== null && rateLimitCountdown > 0) {
+      return;
+    }
+
     setExecutionError(null);
     setSubmitResult(null);
 
@@ -529,11 +535,37 @@ export default function QuizDetailPage() {
       });
       setSubmitResult(result as unknown as CodeSubmitResult);
     } catch (err: any) {
-      setExecutionError(err.message || '제출에 실패했습니다.');
+      // Rate limit 에러 처리
+      if (err.retryAfter) {
+        setRateLimitCountdown(err.retryAfter);
+        setExecutionError(`${err.message}`);
+      } else {
+        setExecutionError(err.message || '제출에 실패했습니다.');
+      }
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  // Rate limit 카운트다운 처리
+  useEffect(() => {
+    if (rateLimitCountdown === null || rateLimitCountdown <= 0) {
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setRateLimitCountdown((prev) => {
+        if (prev === null || prev <= 1) {
+          setExecutionError(null);
+          return null;
+        }
+        setExecutionError(`LLM 요청은 10초에 한 번만 가능합니다. ${prev - 1}초 후에 다시 시도해주세요.`);
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [rateLimitCountdown]);
 
   const showNextHint = () => {
     if (quiz?.hints && currentHintIndex < quiz.hints.length - 1) {
@@ -708,6 +740,8 @@ export default function QuizDetailPage() {
               initialCode={quiz.starter_code}
               onRun={handleRun}
               onSubmit={handleSubmit}
+              submitDisabled={isSubmitting || (rateLimitCountdown !== null && rateLimitCountdown > 0)}
+              submitLabel={rateLimitCountdown ? `${rateLimitCountdown}초 후 제출 가능` : '제출하기'}
             />
           </div>
 

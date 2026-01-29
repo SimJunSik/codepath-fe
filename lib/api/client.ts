@@ -60,7 +60,6 @@ apiClient.interceptors.response.use(
           // 리프레시 토큰이 없으면 로그아웃 처리
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
-          localStorage.removeItem('auth-storage'); // authStore 상태도 제거
           return Promise.reject(error);
         }
 
@@ -80,9 +79,21 @@ apiClient.interceptors.response.use(
         // 토큰 갱신 실패 - 로그아웃 처리
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
-        localStorage.removeItem('auth-storage'); // authStore 상태도 제거
         return Promise.reject(refreshError);
       }
+    }
+
+    // 429 Too Many Requests - Rate Limit
+    if (error.response?.status === 429) {
+      const responseData = error.response?.data as
+        | { detail?: string; retry_after?: number }
+        | undefined;
+      const retryAfter = responseData?.retry_after || 10;
+      const message = responseData?.detail || `요청이 너무 많습니다. ${retryAfter}초 후에 다시 시도해주세요.`;
+
+      const rateLimitError = new Error(message) as Error & { retryAfter?: number };
+      rateLimitError.retryAfter = retryAfter;
+      return Promise.reject(rateLimitError);
     }
 
     // 에러 메시지 추출
