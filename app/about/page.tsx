@@ -62,30 +62,29 @@ export default function AboutPage() {
             {/* Topics */}
             <section>
               <h2 className="text-h2 text-text-primary mb-6">학습 주제</h2>
+              <p className="text-body mb-4">
+                Python의 다양한 심화 주제들을 다룹니다.
+              </p>
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
                   <span className="text-accent">•</span>
-                  <span><strong className="text-text-primary">GIL (Global Interpreter Lock)</strong> - Python 멀티스레딩의 한계와 우회 방법</span>
+                  <span><strong className="text-text-primary">GIL, CPython Internals</strong> - 메모리 관리, 가비지 컬렉션</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-accent">•</span>
-                  <span><strong className="text-text-primary">CPython Internals</strong> - 레퍼런스 카운팅, 가비지 컬렉션, 메모리 관리</span>
+                  <span><strong className="text-text-primary">자료구조</strong> - list, dict, set, tuple의 동작 원리</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-accent">•</span>
-                  <span><strong className="text-text-primary">Mutable vs Immutable</strong> - list, tuple, set, dict의 차이와 동작 원리</span>
+                  <span><strong className="text-text-primary">함수형 프로그래밍</strong> - decorator, closure, generator</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-accent">•</span>
-                  <span><strong className="text-text-primary">Shallow vs Deep Copy</strong> - 얕은 복사와 깊은 복사의 차이</span>
+                  <span><strong className="text-text-primary">동시성</strong> - asyncio, threading, multiprocessing</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-accent">•</span>
-                  <span><strong className="text-text-primary">Generator & Iterator</strong> - yield, lazy evaluation, 메모리 효율</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-accent">•</span>
-                  <span><strong className="text-text-primary">Decorator & Closure</strong> - 함수형 프로그래밍과 메타프로그래밍</span>
+                  <span className="text-text-tertiary">그 외 다양한 Python 심화 주제들...</span>
                 </li>
               </ul>
             </section>
@@ -97,26 +96,9 @@ export default function AboutPage() {
                 서비스 이용 중 문의사항이 있으시면 아래 이메일로 연락해 주세요.
               </p>
               <div className="p-6 bg-bg-elevated border border-border rounded-lg">
-                <div className="space-y-4">
-                  <div>
-                    <p className="text-body-sm text-text-tertiary mb-1">일반 문의</p>
-                    <a href="mailto:contact@codepath.cloud" className="text-accent hover:text-accent-hover transition-colors">
-                      contact@codepath.cloud
-                    </a>
-                  </div>
-                  <div>
-                    <p className="text-body-sm text-text-tertiary mb-1">기술 지원</p>
-                    <a href="mailto:support@codepath.cloud" className="text-accent hover:text-accent-hover transition-colors">
-                      support@codepath.cloud
-                    </a>
-                  </div>
-                  <div>
-                    <p className="text-body-sm text-text-tertiary mb-1">개인정보 관련</p>
-                    <a href="mailto:privacy@codepath.cloud" className="text-accent hover:text-accent-hover transition-colors">
-                      privacy@codepath.cloud
-                    </a>
-                  </div>
-                </div>
+                <a href="mailto:wnstlr24.alarmcon@gmail.com" className="text-accent hover:text-accent-hover transition-colors text-lg">
+                  wnstlr24.alarmcon@gmail.com
+                </a>
               </div>
             </section>
           </div>
