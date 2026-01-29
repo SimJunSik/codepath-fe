@@ -36,6 +36,15 @@ export interface PaginatedResponse<T> {
   timestamp: string;
 }
 
+// Backend actual response for problem list
+export interface ProblemListResponse {
+  problems: Problem[];
+  total: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
+}
+
 export interface ApiError {
   success: false;
   error: {

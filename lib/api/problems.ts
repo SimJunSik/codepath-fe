@@ -5,7 +5,7 @@ import { apiGet, apiPost } from './client';
 import type {
   Problem,
   Submission,
-  PaginatedResponse,
+  ProblemListResponse,
   ProblemFilters,
   CodeRunRequest,
   CodeRunResponse,
@@ -22,7 +22,7 @@ export const getProblems = (filters?: ProblemFilters) => {
         category: filters.category,
       }
     : undefined;
-  return apiGet<PaginatedResponse<Problem>>('/problems', { params });
+  return apiGet<ProblemListResponse>('/problems', { params });
 };
 
 export const getProblem = (problemId: string) => apiGet<Problem>(`/problems/${problemId}`);
