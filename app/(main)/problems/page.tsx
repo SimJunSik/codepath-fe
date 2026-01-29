@@ -8,6 +8,7 @@ import MainLayout from '@/components/layouts/MainLayout';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { getProblems } from '@/lib/api/problems';
+import { useAuthStore } from '@/lib/store/authStore';
 
 interface Problem {
   id: string;
@@ -117,20 +118,12 @@ export default function ProblemsPage() {
   const [filter, setFilter] = useState('all');
   const [problems, setProblems] = useState<Problem[]>(MOCK_PROBLEMS);
   const [loading, setLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { isAuthenticated } = useAuthStore();
 
   useEffect(() => {
     const fetchProblems = async () => {
-      // 토큰 확인
-      const token = localStorage.getItem('accessToken');
-      setIsAuthenticated(!!token);
-
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-
       try {
+        // 비로그인이어도 퀴즈 목록은 보여줌
         const response = await getProblems({ pageSize: 100 });
         if (response && Array.isArray(response.problems)) {
           setProblems(response.problems.map((p: any) => ({

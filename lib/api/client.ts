@@ -60,6 +60,7 @@ apiClient.interceptors.response.use(
           // 리프레시 토큰이 없으면 로그아웃 처리
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
+          localStorage.removeItem('auth-storage'); // authStore 상태도 제거
           return Promise.reject(error);
         }
 
@@ -79,6 +80,7 @@ apiClient.interceptors.response.use(
         // 토큰 갱신 실패 - 로그아웃 처리
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
+        localStorage.removeItem('auth-storage'); // authStore 상태도 제거
         return Promise.reject(refreshError);
       }
     }
