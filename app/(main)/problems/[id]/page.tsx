@@ -456,7 +456,8 @@ export default function QuizDetailPage() {
       const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
 
       if (!token) {
-        router.push('/login');
+        // replace를 사용해 뒤로가기 시 무한 리다이렉트 방지
+        router.replace('/login');
         return;
       }
 
