@@ -23,7 +23,7 @@ export default function AboutPage() {
               <h2 className="text-h2 text-text-primary mb-6">CodePath란?</h2>
               <p className="text-body text-lg leading-relaxed">
                 CodePath는 Python 개발자를 위한 심화 학습 플랫폼입니다.
-                단순한 문법이 아닌, 면접에서 자주 묻는 Python의 핵심 개념들을
+                단순한 문법이 아닌, Python의 핵심 개념들을
                 퀴즈 형식으로 학습할 수 있습니다.
               </p>
             </section>
@@ -39,9 +39,9 @@ export default function AboutPage() {
                   </p>
                 </div>
                 <div className="p-6 bg-bg-elevated border border-border rounded-lg">
-                  <h3 className="text-h4 text-text-primary mb-3">면접 대비</h3>
+                  <h3 className="text-h4 text-text-primary mb-3">실전 문제</h3>
                   <p className="text-body-sm">
-                    실제 기술 면접에서 자주 출제되는 Python 관련 질문들을 다룹니다.
+                    실무에서 마주치는 Python 관련 질문들을 다룹니다.
                   </p>
                 </div>
                 <div className="p-6 bg-bg-elevated border border-border rounded-lg">
