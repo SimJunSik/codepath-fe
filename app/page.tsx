@@ -27,7 +27,7 @@ export default function LandingPage() {
             <p className="text-xl text-text-secondary mb-12 max-w-2xl">
               GIL, CPython 내부 동작, 메모리 관리까지.
               <br />
-              면접에서 자주 나오는 Python 핵심 개념을 퀴즈로 학습합니다.
+              Python 핵심 개념을 퀴즈로 학습합니다.
             </p>
 
             <div className="flex items-center gap-4">
@@ -67,7 +67,7 @@ export default function LandingPage() {
           <div className="max-w-4xl mx-auto">
             <h2 className="text-h2 mb-4 text-text-primary">Topics</h2>
             <p className="text-body text-text-secondary mb-8">
-              Python 면접에서 자주 나오는 핵심 주제들을 다룹니다
+              Python 핵심 주제들을 다룹니다
             </p>
 
             {/* Python Internals */}
