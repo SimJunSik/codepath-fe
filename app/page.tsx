@@ -65,24 +65,89 @@ export default function LandingPage() {
         {/* Topics */}
         <section className="container mx-auto px-6 py-20 border-t border-border">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-h2 mb-8 text-text-primary">Topics</h2>
-            <div className="grid md:grid-cols-2 gap-4">
-              {[
-                { title: 'GIL (Global Interpreter Lock)', desc: 'Python 멀티스레딩의 한계와 우회 방법' },
-                { title: 'CPython Internals', desc: '레퍼런스 카운팅, 가비지 컬렉션, 메모리 관리' },
-                { title: 'Mutable vs Immutable', desc: 'list, tuple, set, dict의 차이와 동작 원리' },
-                { title: 'Shallow vs Deep Copy', desc: '얕은 복사와 깊은 복사의 차이' },
-                { title: 'Generator & Iterator', desc: 'yield, lazy evaluation, 메모리 효율' },
-                { title: 'Decorator & Closure', desc: '함수형 프로그래밍과 메타프로그래밍' },
-              ].map((topic, i) => (
-                <div
-                  key={i}
-                  className="p-4 bg-bg-elevated border border-border rounded-lg hover:border-border-emphasis transition-colors"
-                >
-                  <h3 className="text-label text-text-primary mb-1">{topic.title}</h3>
-                  <p className="text-body-sm text-text-tertiary">{topic.desc}</p>
-                </div>
-              ))}
+            <h2 className="text-h2 mb-4 text-text-primary">Topics</h2>
+            <p className="text-body text-text-secondary mb-8">
+              Python 면접에서 자주 나오는 핵심 주제들을 다룹니다
+            </p>
+
+            {/* Python Internals */}
+            <div className="mb-8">
+              <h3 className="text-label text-text-tertiary mb-4 font-mono"># Python Internals</h3>
+              <div className="grid md:grid-cols-2 gap-4">
+                {[
+                  { title: 'GIL (Global Interpreter Lock)', desc: 'Python 멀티스레딩의 한계와 우회 방법' },
+                  { title: 'CPython Internals', desc: '레퍼런스 카운팅, 가비지 컬렉션의 동작 원리' },
+                  { title: 'Memory Management', desc: '객체 생성, 메모리 할당과 해제' },
+                ].map((topic, i) => (
+                  <div
+                    key={i}
+                    className="p-4 bg-bg-elevated border border-border rounded-lg hover:border-border-emphasis transition-colors"
+                  >
+                    <h4 className="text-label text-text-primary mb-1">{topic.title}</h4>
+                    <p className="text-body-sm text-text-tertiary">{topic.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Data Structures */}
+            <div className="mb-8">
+              <h3 className="text-label text-text-tertiary mb-4 font-mono"># Data Structures</h3>
+              <div className="grid md:grid-cols-2 gap-4">
+                {[
+                  { title: 'Mutable vs Immutable', desc: 'list, tuple, set, dict의 차이와 동작 원리' },
+                  { title: 'Shallow vs Deep Copy', desc: '얕은 복사와 깊은 복사의 차이점' },
+                  { title: 'Collections Module', desc: 'defaultdict, Counter, deque 등 고급 자료구조' },
+                ].map((topic, i) => (
+                  <div
+                    key={i}
+                    className="p-4 bg-bg-elevated border border-border rounded-lg hover:border-border-emphasis transition-colors"
+                  >
+                    <h4 className="text-label text-text-primary mb-1">{topic.title}</h4>
+                    <p className="text-body-sm text-text-tertiary">{topic.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Functions & Control Flow */}
+            <div className="mb-8">
+              <h3 className="text-label text-text-tertiary mb-4 font-mono"># Functions & Control Flow</h3>
+              <div className="grid md:grid-cols-2 gap-4">
+                {[
+                  { title: 'Generator & Iterator', desc: 'yield, lazy evaluation, 메모리 효율' },
+                  { title: 'Decorator & Closure', desc: '함수형 프로그래밍과 메타프로그래밍' },
+                  { title: 'Function Arguments', desc: '*args, **kwargs, 기본값과 스코프' },
+                  { title: 'Exception Handling', desc: 'try/except/finally, 예외 체이닝' },
+                ].map((topic, i) => (
+                  <div
+                    key={i}
+                    className="p-4 bg-bg-elevated border border-border rounded-lg hover:border-border-emphasis transition-colors"
+                  >
+                    <h4 className="text-label text-text-primary mb-1">{topic.title}</h4>
+                    <p className="text-body-sm text-text-tertiary">{topic.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* OOP & Concurrency */}
+            <div>
+              <h3 className="text-label text-text-tertiary mb-4 font-mono"># OOP & Concurrency</h3>
+              <div className="grid md:grid-cols-2 gap-4">
+                {[
+                  { title: 'Object-Oriented Python', desc: 'MRO, 다중 상속, 메타클래스' },
+                  { title: 'Concurrency', desc: 'threading, multiprocessing, asyncio' },
+                ].map((topic, i) => (
+                  <div
+                    key={i}
+                    className="p-4 bg-bg-elevated border border-border rounded-lg hover:border-border-emphasis transition-colors"
+                  >
+                    <h4 className="text-label text-text-primary mb-1">{topic.title}</h4>
+                    <p className="text-body-sm text-text-tertiary">{topic.desc}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
@@ -96,15 +161,12 @@ export default function LandingPage() {
               © 2026 CodePath
             </div>
             <div className="flex items-center gap-6">
-              <Link href="/about" className="text-text-tertiary hover:text-text-secondary transition-colors text-caption">
-                서비스 소개
-              </Link>
-              <Link href="/terms" className="text-text-tertiary hover:text-text-secondary transition-colors text-caption">
+              <a href="#" className="text-text-tertiary hover:text-text-secondary transition-colors text-caption">
                 이용약관
-              </Link>
-              <Link href="/privacy" className="text-text-tertiary hover:text-text-secondary transition-colors text-caption">
+              </a>
+              <a href="#" className="text-text-tertiary hover:text-text-secondary transition-colors text-caption">
                 개인정보처리방침
-              </Link>
+              </a>
             </div>
           </div>
         </div>
