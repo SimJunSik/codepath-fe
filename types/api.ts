@@ -78,6 +78,20 @@ export interface AuthResponse {
   expiresIn: number;
 }
 
+export interface SendVerificationCodeRequest {
+  email: string;
+}
+
+export interface VerifyCodeRequest {
+  email: string;
+  code: string;
+}
+
+export interface VerifyCodeResponse {
+  message: string;
+  verified: boolean;
+}
+
 export interface OAuthProvider {
   provider: 'google' | 'github' | 'kakao';
   redirectUrl: string;

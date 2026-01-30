@@ -2,14 +2,17 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/store/authStore';
-import { signup } from '@/lib/api/auth';
+import { signup, sendVerificationCode, verifyCode } from '@/lib/api/auth';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Card from '@/components/ui/Card';
+
+const CODE_LENGTH = 6;
+const RESEND_COOLDOWN = 300; // 5 minutes
 
 export default function SignupPage() {
   const router = useRouter();
@@ -26,11 +29,127 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
+  // Email verification state
+  const [emailVerified, setEmailVerified] = useState(false);
+  const [showCodeInput, setShowCodeInput] = useState(false);
+  const [verificationCode, setVerificationCode] = useState<string[]>(Array(CODE_LENGTH).fill(''));
+  const [sendingCode, setSendingCode] = useState(false);
+  const [verifyingCode, setVerifyingCode] = useState(false);
+  const [countdown, setCountdown] = useState(0);
+
+  const codeInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  // Countdown timer for resend
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setInterval(() => {
+        setCountdown((prev) => prev - 1);
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [countdown]);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const validateEmail = (email: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
+  const handleSendCode = async () => {
+    if (!validateEmail(formData.email)) {
+      setErrors({ ...errors, email: '유효한 이메일을 입력하세요' });
+      return;
+    }
+
+    setSendingCode(true);
+    setErrors({ ...errors, email: '', verification: '' });
+
+    try {
+      await sendVerificationCode(formData.email);
+      setShowCodeInput(true);
+      setCountdown(RESEND_COOLDOWN);
+      setVerificationCode(Array(CODE_LENGTH).fill(''));
+      setTimeout(() => codeInputRefs.current[0]?.focus(), 100);
+    } catch (err: any) {
+      setErrors({ ...errors, email: err.message || '인증 코드 발송에 실패했습니다.' });
+    } finally {
+      setSendingCode(false);
+    }
+  };
+
+  const handleCodeChange = (index: number, value: string) => {
+    const digit = value.replace(/\D/g, '').slice(-1);
+    const newCode = [...verificationCode];
+    newCode[index] = digit;
+    setVerificationCode(newCode);
+    setErrors({ ...errors, verification: '' });
+
+    if (digit && index < CODE_LENGTH - 1) {
+      codeInputRefs.current[index + 1]?.focus();
+    }
+
+    // Auto-verify when all digits filled
+    if (digit && index === CODE_LENGTH - 1) {
+      const fullCode = newCode.join('');
+      if (fullCode.length === CODE_LENGTH) {
+        handleVerifyCode(fullCode);
+      }
+    }
+  };
+
+  const handleCodeKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace' && !verificationCode[index] && index > 0) {
+      codeInputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handleCodePaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, CODE_LENGTH);
+
+    if (pastedData.length > 0) {
+      const newCode = [...verificationCode];
+      for (let i = 0; i < pastedData.length; i++) {
+        newCode[i] = pastedData[i];
+      }
+      setVerificationCode(newCode);
+
+      if (pastedData.length === CODE_LENGTH) {
+        handleVerifyCode(pastedData);
+      } else {
+        codeInputRefs.current[Math.min(pastedData.length, CODE_LENGTH - 1)]?.focus();
+      }
+    }
+  };
+
+  const handleVerifyCode = async (code: string) => {
+    setVerifyingCode(true);
+    setErrors({ ...errors, verification: '' });
+
+    try {
+      const result = await verifyCode(formData.email, code);
+      if (result.verified) {
+        setEmailVerified(true);
+        setShowCodeInput(false);
+      }
+    } catch (err: any) {
+      setErrors({ ...errors, verification: err.message || '인증 코드가 올바르지 않습니다.' });
+      setVerificationCode(Array(CODE_LENGTH).fill(''));
+      codeInputRefs.current[0]?.focus();
+    } finally {
+      setVerifyingCode(false);
+    }
+  };
+
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
-      newErrors.email = '유효한 이메일을 입력하세요';
+    if (!emailVerified) {
+      newErrors.email = '이메일 인증을 완료해 주세요';
     }
 
     if (formData.password.length < 8) {
@@ -42,6 +161,7 @@ export default function SignupPage() {
     } else if (!/[0-9]/.test(formData.password)) {
       newErrors.password = '비밀번호에 숫자를 포함해주세요';
     }
+
     if (formData.confirmPassword !== formData.password) {
       newErrors.confirmPassword = '비밀번호가 일치하지 않습니다';
     }
@@ -82,7 +202,6 @@ export default function SignupPage() {
       });
       setAuth(response.user, response.accessToken);
 
-      // localStorage에 refreshToken 저장
       if (typeof window !== 'undefined') {
         localStorage.setItem('refreshToken', response.refreshToken);
       }
@@ -94,6 +213,8 @@ export default function SignupPage() {
       setLoading(false);
     }
   };
+
+  const canSubmit = emailVerified && agreedToTerms && !loading;
 
   return (
     <div className="min-h-screen bg-bg-base flex items-center justify-center px-6 py-12">
@@ -108,6 +229,103 @@ export default function SignupPage() {
 
         <Card variant="elevated" padding="lg">
           <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Email with verification */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-text-secondary">
+                이메일 <span className="text-error">*</span>
+              </label>
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <input
+                    type="email"
+                    placeholder="your@email.com"
+                    value={formData.email}
+                    onChange={(e) => {
+                      setFormData({ ...formData, email: e.target.value });
+                      if (emailVerified) {
+                        setEmailVerified(false);
+                        setShowCodeInput(false);
+                      }
+                    }}
+                    disabled={emailVerified}
+                    className={`
+                      w-full h-11 px-4 text-base border rounded-md
+                      bg-bg-elevated text-text-primary placeholder:text-text-tertiary
+                      transition-all duration-200
+                      focus:outline-none focus:ring-2 focus:ring-offset-0
+                      disabled:bg-bg-active disabled:text-text-secondary disabled:cursor-not-allowed
+                      ${errors.email ? 'border-error focus:ring-error' : 'border-border focus:border-accent focus:ring-accent/20'}
+                      ${emailVerified ? 'border-success bg-success/5' : ''}
+                    `}
+                  />
+                </div>
+                {!emailVerified ? (
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={handleSendCode}
+                    loading={sendingCode}
+                    disabled={!validateEmail(formData.email) || sendingCode}
+                    className="whitespace-nowrap"
+                  >
+                    {showCodeInput && countdown > 0 ? '재발송' : '인증하기'}
+                  </Button>
+                ) : (
+                  <div className="flex items-center px-3 text-success font-medium text-sm">
+                    인증완료
+                  </div>
+                )}
+              </div>
+              {errors.email && (
+                <p className="text-sm text-error">{errors.email}</p>
+              )}
+            </div>
+
+            {/* Verification code input */}
+            {showCodeInput && !emailVerified && (
+              <div className="space-y-3 p-4 bg-bg-base rounded-lg border border-border">
+                <p className="text-sm text-text-secondary text-center">
+                  <span className="text-accent font-medium">{formData.email}</span>
+                  <br />으로 발송된 6자리 코드를 입력하세요
+                </p>
+                <div className="flex justify-center gap-2">
+                  {verificationCode.map((digit, index) => (
+                    <input
+                      key={index}
+                      ref={(el) => { codeInputRefs.current[index] = el; }}
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={1}
+                      value={digit}
+                      onChange={(e) => handleCodeChange(index, e.target.value)}
+                      onKeyDown={(e) => handleCodeKeyDown(index, e)}
+                      onPaste={handleCodePaste}
+                      disabled={verifyingCode}
+                      className={`
+                        w-10 h-12 text-center text-xl font-bold
+                        border-2 rounded-lg bg-bg-elevated text-text-primary
+                        transition-all duration-200
+                        focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20
+                        disabled:opacity-50
+                        ${errors.verification ? 'border-error' : 'border-border'}
+                      `}
+                    />
+                  ))}
+                </div>
+                {countdown > 0 && (
+                  <p className="text-xs text-text-tertiary text-center">
+                    남은 시간: {formatTime(countdown)}
+                  </p>
+                )}
+                {errors.verification && (
+                  <p className="text-sm text-error text-center">{errors.verification}</p>
+                )}
+                {verifyingCode && (
+                  <p className="text-sm text-accent text-center">확인 중...</p>
+                )}
+              </div>
+            )}
+
             <Input
               type="text"
               label="이름"
@@ -130,23 +348,13 @@ export default function SignupPage() {
             />
 
             <Input
-              type="email"
-              label="이메일"
-              placeholder="your@email.com"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              error={errors.email}
-              required
-            />
-
-            <Input
               type="password"
               label="비밀번호"
               placeholder="8자 이상 입력하세요"
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               error={errors.password}
-              helperText="영문, 숫자, 특수문자 포함 8자 이상"
+              helperText="영문 대/소문자, 숫자 포함 8자 이상"
               required
             />
 
@@ -169,11 +377,11 @@ export default function SignupPage() {
                 className="mt-1 h-4 w-4 rounded border-border bg-bg-base text-accent accent-accent focus:ring-accent focus:ring-offset-0"
               />
               <label htmlFor="terms" className="text-sm text-text-secondary">
-                <Link href="#" className="text-accent hover:underline">
+                <Link href="/terms" className="text-accent hover:underline">
                   이용약관
                 </Link>{' '}
                 및{' '}
-                <Link href="#" className="text-accent hover:underline">
+                <Link href="/privacy" className="text-accent hover:underline">
                   개인정보처리방침
                 </Link>
                 에 동의합니다
@@ -196,9 +404,16 @@ export default function SignupPage() {
               size="lg"
               className="w-full"
               loading={loading}
+              disabled={!canSubmit}
             >
               가입하기
             </Button>
+
+            {!emailVerified && (
+              <p className="text-xs text-text-tertiary text-center">
+                이메일 인증을 완료해야 가입할 수 있습니다
+              </p>
+            )}
           </form>
 
           <div className="mt-6 text-center text-sm text-text-secondary">

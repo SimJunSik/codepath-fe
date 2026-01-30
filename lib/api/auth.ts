@@ -2,7 +2,7 @@
 // API 계약서 기준
 
 import { apiPost, apiGet } from './client';
-import type { LoginRequest, SignupRequest, AuthResponse, User } from '@/types';
+import type { LoginRequest, SignupRequest, AuthResponse, User, VerifyCodeResponse } from '@/types';
 
 interface BackendUserResponse {
   id: string;
@@ -41,14 +41,36 @@ const normalizeTokens = (response: BackendTokenResponse) => ({
   expiresIn: response.expiresIn || 0,
 });
 
+export const sendVerificationCode = async (email: string): Promise<{ message: string }> => {
+  return apiPost<{ message: string }>('/auth/send-verification-code', { email });
+};
+
+export const verifyCode = async (email: string, code: string): Promise<VerifyCodeResponse> => {
+  return apiPost<VerifyCodeResponse>('/auth/verify-code', { email, code });
+};
+
 export const signup = async (data: SignupRequest): Promise<AuthResponse> => {
-  await apiPost<BackendUserResponse>('/auth/signup', {
+  const tokenResponse = await apiPost<BackendTokenResponse>('/auth/signup', {
     email: data.email,
     username: data.username,
     password: data.password,
     full_name: data.displayName,
   });
-  return login({ email: data.email, password: data.password });
+  const { accessToken, refreshToken, expiresIn } = normalizeTokens(tokenResponse);
+
+  if (typeof window !== 'undefined' && accessToken) {
+    localStorage.setItem('accessToken', accessToken);
+  }
+
+  const userResponse = await apiGet<BackendUserResponse>('/auth/me');
+  const user = mapUser(userResponse);
+
+  return {
+    user,
+    accessToken,
+    refreshToken,
+    expiresIn,
+  };
 };
 
 export const login = async (data: LoginRequest): Promise<AuthResponse> => {
