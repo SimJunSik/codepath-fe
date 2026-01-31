@@ -203,6 +203,13 @@ export default function ProblemsPage() {
               </Button>
               <Button
                 size="sm"
+                variant={difficultyFilter === 'beginner' ? 'primary' : 'outline'}
+                onClick={() => setDifficultyFilter('beginner')}
+              >
+                입문
+              </Button>
+              <Button
+                size="sm"
                 variant={difficultyFilter === 'easy' ? 'primary' : 'outline'}
                 onClick={() => setDifficultyFilter('easy')}
               >
