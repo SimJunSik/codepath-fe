@@ -63,6 +63,9 @@ export default function RootLayout({
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2305386123114991"
           crossOrigin="anonymous"
         />
+        <script
+          src="https://cdn.iamport.kr/v1/iamport.js"
+        />
       </head>
       <body className="font-sans antialiased">
         <QueryProvider>
