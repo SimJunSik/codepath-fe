@@ -70,7 +70,7 @@ export default function PricingPage() {
         return;
       }
 
-      IMP.init('imp00000000'); // TODO: 실제 가맹점 코드로 변경
+      IMP.init('imp87212885');
 
       IMP.request_pay(
         {
