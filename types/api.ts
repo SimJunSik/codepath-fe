@@ -101,7 +101,7 @@ export interface OAuthProvider {
 // Problem API
 // ========================================
 
-export type SolveStatus = 'solved' | 'attempted' | 'not_attempted';
+import type { SolveStatus } from './models';
 
 export interface ProblemFilters {
   page?: number;

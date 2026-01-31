@@ -9,7 +9,7 @@ import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { getProblems } from '@/lib/api/problems';
 import { useAuthStore } from '@/lib/store/authStore';
-import type { SolveStatus } from '@/types/api';
+import type { SolveStatus } from '@/types';
 
 interface Problem {
   id: string;
