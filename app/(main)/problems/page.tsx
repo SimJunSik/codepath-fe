@@ -104,16 +104,29 @@ const difficultyLabels: Record<string, string> = {
 };
 
 const categoryLabels: Record<string, string> = {
+  basics: '기초',
   gil: 'GIL',
   cpython: 'CPython',
   memory: '메모리',
   data_structure: '자료구조',
   copy: '복사',
+  collections: '컬렉션',
   generator: 'Generator',
   decorator: 'Decorator',
   closure: 'Closure',
+  function: '함수',
+  control_flow: '제어 흐름',
   concurrency: '동시성',
   oop: 'OOP',
+  string: '문자열',
+  builtin: '내장 함수',
+  exception: '예외 처리',
+  io: '입출력',
+  module: '모듈',
+  unpacking: '언패킹',
+  syntax: '문법',
+  truthiness: 'Truthiness',
+  best_practice: '모범 사례',
 };
 
 const solveStatusConfig: Record<string, { label: string; icon: string; color: string }> = {
