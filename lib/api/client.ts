@@ -57,9 +57,16 @@ apiClient.interceptors.response.use(
         const refreshToken = localStorage.getItem('refreshToken');
 
         if (!refreshToken) {
-          // 리프레시 토큰이 없으면 로그아웃 처리
+          // 리프레시 토큰이 없으면 로그아웃 처리 및 로그인 페이지로 리다이렉트
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
+
+          // 클라이언트 사이드에서만 리다이렉트
+          if (typeof window !== 'undefined') {
+            const currentPath = window.location.pathname;
+            window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
+          }
+
           return Promise.reject(error);
         }
 
@@ -76,9 +83,17 @@ apiClient.interceptors.response.use(
         }
         return apiClient(originalRequest);
       } catch (refreshError) {
-        // 토큰 갱신 실패 - 로그아웃 처리
+        // 토큰 갱신 실패 - 로그아웃 처리 및 로그인 페이지로 리다이렉트
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
+
+        // 클라이언트 사이드에서만 리다이렉트
+        if (typeof window !== 'undefined') {
+          // 현재 URL을 저장하여 로그인 후 돌아올 수 있게 함
+          const currentPath = window.location.pathname;
+          window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
+        }
+
         return Promise.reject(refreshError);
       }
     }

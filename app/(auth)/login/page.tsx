@@ -4,7 +4,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/lib/store/authStore';
 import { login } from '@/lib/api/auth';
 import Button from '@/components/ui/Button';
@@ -13,7 +13,9 @@ import Card from '@/components/ui/Card';
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const setAuth = useAuthStore((state) => state.setAuth);
+  const redirectPath = searchParams.get('redirect');
 
   const [formData, setFormData] = useState({
     email: '',
@@ -36,8 +38,10 @@ export default function LoginPage() {
         localStorage.setItem('refreshToken', response.refreshToken);
       }
 
-      // Admin 사용자는 /admin으로, 일반 사용자는 /problems로 리다이렉트
-      if (response.user.role === 'admin') {
+      // redirect 파라미터가 있으면 해당 경로로, 없으면 기본 경로로 이동
+      if (redirectPath) {
+        router.push(redirectPath);
+      } else if (response.user.role === 'admin') {
         router.push('/admin');
       } else {
         router.push('/problems');
