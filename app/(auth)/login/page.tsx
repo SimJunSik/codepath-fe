@@ -36,7 +36,12 @@ export default function LoginPage() {
         localStorage.setItem('refreshToken', response.refreshToken);
       }
 
-      router.push('/problems');
+      // Admin 사용자는 /admin으로, 일반 사용자는 /problems로 리다이렉트
+      if (response.user.role === 'admin') {
+        router.push('/admin');
+      } else {
+        router.push('/problems');
+      }
     } catch (err: any) {
       setError(err.message || '로그인에 실패했습니다.');
     } finally {
