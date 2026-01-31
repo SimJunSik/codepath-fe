@@ -6,42 +6,18 @@ import { useState } from 'react';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { useAuthStore } from '@/lib/store/authStore';
+import { apiPost } from '@/lib/api/client';
 
 export default function AdminHomePage() {
   const [migrationLoading, setMigrationLoading] = useState(false);
   const [migrationResult, setMigrationResult] = useState<any>(null);
-  const accessToken = useAuthStore((state) => state.accessToken);
 
   const handleMigration = async () => {
     setMigrationLoading(true);
     setMigrationResult(null);
 
     try {
-      const response = await fetch('/api/v1/admin/migrations/enum-values', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-        },
-      });
-
-      if (!response.ok) {
-        // Try to parse error response
-        let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.detail || errorData.message || errorMessage;
-        } catch {
-          // If JSON parsing fails, use default error message
-        }
-
-        setMigrationResult({
-          success: false,
-          message: errorMessage,
-        });
-        return;
-      }
-
-      const result = await response.json();
+      const result = await apiPost<any>('/admin/migrations/enum-values');
       setMigrationResult(result);
     } catch (error: any) {
       setMigrationResult({
