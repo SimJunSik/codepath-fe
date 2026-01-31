@@ -95,6 +95,8 @@ const difficultyColors: Record<string, string> = {
   expert: 'bg-error-bg text-error border border-error/30',
 };
 
+const difficultyOrder = ['beginner', 'easy', 'medium', 'hard', 'expert'] as const;
+
 const difficultyLabels: Record<string, string> = {
   beginner: '입문',
   easy: '쉬움',
@@ -201,34 +203,16 @@ export default function ProblemsPage() {
               >
                 전체
               </Button>
-              <Button
-                size="sm"
-                variant={difficultyFilter === 'beginner' ? 'primary' : 'outline'}
-                onClick={() => setDifficultyFilter('beginner')}
-              >
-                입문
-              </Button>
-              <Button
-                size="sm"
-                variant={difficultyFilter === 'easy' ? 'primary' : 'outline'}
-                onClick={() => setDifficultyFilter('easy')}
-              >
-                쉬움
-              </Button>
-              <Button
-                size="sm"
-                variant={difficultyFilter === 'medium' ? 'primary' : 'outline'}
-                onClick={() => setDifficultyFilter('medium')}
-              >
-                보통
-              </Button>
-              <Button
-                size="sm"
-                variant={difficultyFilter === 'hard' ? 'primary' : 'outline'}
-                onClick={() => setDifficultyFilter('hard')}
-              >
-                어려움
-              </Button>
+              {difficultyOrder.map((difficulty) => (
+                <Button
+                  key={difficulty}
+                  size="sm"
+                  variant={difficultyFilter === difficulty ? 'primary' : 'outline'}
+                  onClick={() => setDifficultyFilter(difficulty)}
+                >
+                  {difficultyLabels[difficulty]}
+                </Button>
+              ))}
             </div>
 
             {/* 풀이 상태 필터 - 로그인 시에만 표시 */}
