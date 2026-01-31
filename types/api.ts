@@ -101,6 +101,8 @@ export interface OAuthProvider {
 // Problem API
 // ========================================
 
+export type SolveStatus = 'solved' | 'attempted' | 'not_attempted';
+
 export interface ProblemFilters {
   page?: number;
   pageSize?: number;
@@ -109,6 +111,7 @@ export interface ProblemFilters {
   tags?: string[];
   search?: string;
   sortBy?: 'newest' | 'difficulty' | 'acceptance';
+  solveStatus?: SolveStatus;
 }
 
 export interface CodeRunRequest {

@@ -9,6 +9,7 @@ import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { getProblems } from '@/lib/api/problems';
 import { useAuthStore } from '@/lib/store/authStore';
+import type { SolveStatus } from '@/types/api';
 
 interface Problem {
   id: string;
@@ -19,6 +20,7 @@ interface Problem {
   total_submissions: number;
   successful_submissions: number;
   success_rate: number;
+  solve_status?: SolveStatus | null;
 }
 
 // Fallback mock data (비로그인 또는 API 실패 시)
@@ -114,17 +116,29 @@ const categoryLabels: Record<string, string> = {
   oop: 'OOP',
 };
 
+const solveStatusConfig: Record<string, { label: string; icon: string; color: string }> = {
+  solved: { label: '완료', icon: '✓', color: 'text-success' },
+  attempted: { label: '시도 중', icon: '○', color: 'text-warning' },
+  not_attempted: { label: '미시도', icon: '-', color: 'text-text-tertiary' },
+};
+
 export default function ProblemsPage() {
-  const [filter, setFilter] = useState('all');
+  const [difficultyFilter, setDifficultyFilter] = useState('all');
+  const [solveStatusFilter, setSolveStatusFilter] = useState<SolveStatus | 'all'>('all');
   const [problems, setProblems] = useState<Problem[]>(MOCK_PROBLEMS);
   const [loading, setLoading] = useState(true);
   const { isAuthenticated } = useAuthStore();
 
   useEffect(() => {
     const fetchProblems = async () => {
+      setLoading(true);
       try {
         // 비로그인이어도 퀴즈 목록은 보여줌
-        const response = await getProblems({ pageSize: 100 });
+        // solve_status 필터는 로그인 시에만 적용
+        const response = await getProblems({
+          pageSize: 100,
+          solveStatus: isAuthenticated && solveStatusFilter !== 'all' ? solveStatusFilter : undefined,
+        });
         if (response && Array.isArray(response.problems)) {
           setProblems(response.problems.map((p: any) => ({
             ...p,
@@ -140,11 +154,11 @@ export default function ProblemsPage() {
     };
 
     fetchProblems();
-  }, []);
+  }, [solveStatusFilter, isAuthenticated]);
 
-  const filteredProblems = filter === 'all'
+  const filteredProblems = difficultyFilter === 'all'
     ? problems
-    : problems.filter(p => p.difficulty === filter);
+    : problems.filter(p => p.difficulty === difficultyFilter);
 
   return (
     <MainLayout>
@@ -164,36 +178,73 @@ export default function ProblemsPage() {
         {/* Filters */}
         <Card variant="elevated" padding="md" className="mb-6">
           <div className="flex flex-wrap items-center gap-4">
+            {/* 난이도 필터 */}
             <div className="flex gap-2">
+              <span className="text-sm text-text-secondary self-center mr-2">난이도:</span>
               <Button
                 size="sm"
-                variant={filter === 'all' ? 'primary' : 'outline'}
-                onClick={() => setFilter('all')}
+                variant={difficultyFilter === 'all' ? 'primary' : 'outline'}
+                onClick={() => setDifficultyFilter('all')}
               >
                 전체
               </Button>
               <Button
                 size="sm"
-                variant={filter === 'easy' ? 'primary' : 'outline'}
-                onClick={() => setFilter('easy')}
+                variant={difficultyFilter === 'easy' ? 'primary' : 'outline'}
+                onClick={() => setDifficultyFilter('easy')}
               >
                 쉬움
               </Button>
               <Button
                 size="sm"
-                variant={filter === 'medium' ? 'primary' : 'outline'}
-                onClick={() => setFilter('medium')}
+                variant={difficultyFilter === 'medium' ? 'primary' : 'outline'}
+                onClick={() => setDifficultyFilter('medium')}
               >
                 보통
               </Button>
               <Button
                 size="sm"
-                variant={filter === 'hard' ? 'primary' : 'outline'}
-                onClick={() => setFilter('hard')}
+                variant={difficultyFilter === 'hard' ? 'primary' : 'outline'}
+                onClick={() => setDifficultyFilter('hard')}
               >
                 어려움
               </Button>
             </div>
+
+            {/* 풀이 상태 필터 - 로그인 시에만 표시 */}
+            {isAuthenticated && (
+              <div className="flex gap-2 ml-4 border-l border-border pl-4">
+                <span className="text-sm text-text-secondary self-center mr-2">풀이 상태:</span>
+                <Button
+                  size="sm"
+                  variant={solveStatusFilter === 'all' ? 'primary' : 'outline'}
+                  onClick={() => setSolveStatusFilter('all')}
+                >
+                  전체
+                </Button>
+                <Button
+                  size="sm"
+                  variant={solveStatusFilter === 'solved' ? 'primary' : 'outline'}
+                  onClick={() => setSolveStatusFilter('solved')}
+                >
+                  ✓ 완료
+                </Button>
+                <Button
+                  size="sm"
+                  variant={solveStatusFilter === 'attempted' ? 'primary' : 'outline'}
+                  onClick={() => setSolveStatusFilter('attempted')}
+                >
+                  ○ 시도 중
+                </Button>
+                <Button
+                  size="sm"
+                  variant={solveStatusFilter === 'not_attempted' ? 'primary' : 'outline'}
+                  onClick={() => setSolveStatusFilter('not_attempted')}
+                >
+                  - 미시도
+                </Button>
+              </div>
+            )}
           </div>
         </Card>
 
@@ -208,6 +259,11 @@ export default function ProblemsPage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-border bg-bg-hover">
+                    {isAuthenticated && (
+                      <th className="px-4 py-4 text-center text-sm font-semibold text-text-secondary w-16">
+                        상태
+                      </th>
+                    )}
                     <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">
                       제목
                     </th>
@@ -223,36 +279,53 @@ export default function ProblemsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  {filteredProblems.map((problem) => (
-                    <tr
-                      key={problem.id}
-                      className="hover:bg-bg-hover transition-colors"
-                    >
-                      <td className="px-6 py-4">
-                        <Link
-                          href={`/problems/${problem.id}`}
-                          className="text-accent hover:text-accent-hover font-medium"
-                        >
-                          {problem.title}
-                        </Link>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span
-                          className={`px-3 py-1 text-xs font-medium rounded-full ${
-                            difficultyColors[problem.difficulty] || difficultyColors.medium
-                          }`}
-                        >
-                          {difficultyLabels[problem.difficulty] || problem.difficulty}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-text-secondary">
-                        {categoryLabels[problem.category] || problem.category}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-text-secondary">
-                        {problem.success_rate.toFixed(0)}%
-                      </td>
-                    </tr>
-                  ))}
+                  {filteredProblems.map((problem) => {
+                    const status = problem.solve_status;
+                    const statusConfig = status ? solveStatusConfig[status] : null;
+
+                    return (
+                      <tr
+                        key={problem.id}
+                        className="hover:bg-bg-hover transition-colors"
+                      >
+                        {isAuthenticated && (
+                          <td className="px-4 py-4 text-center">
+                            {statusConfig && (
+                              <span
+                                className={`text-lg font-bold ${statusConfig.color}`}
+                                title={statusConfig.label}
+                              >
+                                {statusConfig.icon}
+                              </span>
+                            )}
+                          </td>
+                        )}
+                        <td className="px-6 py-4">
+                          <Link
+                            href={`/problems/${problem.id}`}
+                            className="text-accent hover:text-accent-hover font-medium"
+                          >
+                            {problem.title}
+                          </Link>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span
+                            className={`px-3 py-1 text-xs font-medium rounded-full ${
+                              difficultyColors[problem.difficulty] || difficultyColors.medium
+                            }`}
+                          >
+                            {difficultyLabels[problem.difficulty] || problem.difficulty}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-text-secondary">
+                          {categoryLabels[problem.category] || problem.category}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-text-secondary">
+                          {problem.success_rate.toFixed(0)}%
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

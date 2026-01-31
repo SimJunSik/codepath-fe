@@ -53,6 +53,8 @@ export interface SocialLinks {
 // Problem Models
 // ========================================
 
+export type SolveStatus = 'solved' | 'attempted' | 'not_attempted';
+
 export interface Problem {
   id: string;
   title: string;
@@ -69,6 +71,7 @@ export interface Problem {
   totalSubmissions: number;
   successfulSubmissions: number;
   isSolved?: boolean;
+  solveStatus?: SolveStatus;
   createdAt: string;
 }
 

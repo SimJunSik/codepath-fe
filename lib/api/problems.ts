@@ -20,6 +20,7 @@ export const getProblems = (filters?: ProblemFilters) => {
         page_size: filters.pageSize,
         difficulty: filters.difficulty,
         category: filters.category,
+        solve_status: filters.solveStatus,
       }
     : undefined;
   return apiGet<ProblemListResponse>('/problems', { params });
