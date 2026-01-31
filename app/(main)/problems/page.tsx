@@ -190,6 +190,64 @@ export default function ProblemsPage() {
           )}
         </div>
 
+        {/* 진행 상황 통계 */}
+        {isAuthenticated && problems.length > 0 && !loading && (
+          <Card variant="elevated" padding="lg" className="mb-6">
+            <h2 className="text-lg font-semibold text-text-primary mb-4">학습 진행 상황</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-text-primary mb-1">
+                  {problems.length}
+                </div>
+                <div className="text-sm text-text-secondary">전체 문제</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-success mb-1">
+                  {problems.filter((p) => p.solve_status === 'solved').length}
+                </div>
+                <div className="text-sm text-text-secondary">해결</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-warning mb-1">
+                  {problems.filter((p) => p.solve_status === 'attempted').length}
+                </div>
+                <div className="text-sm text-text-secondary">시도</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-text-tertiary mb-1">
+                  {problems.filter((p) => p.solve_status === 'not_attempted').length}
+                </div>
+                <div className="text-sm text-text-secondary">미시도</div>
+              </div>
+            </div>
+            <div className="mt-6">
+              <div className="flex items-center justify-between text-sm text-text-secondary mb-2">
+                <span>진행률</span>
+                <span>
+                  {Math.round(
+                    (problems.filter((p) => p.solve_status === 'solved').length /
+                      problems.length) *
+                      100
+                  )}
+                  %
+                </span>
+              </div>
+              <div className="w-full bg-bg-tertiary rounded-full h-2">
+                <div
+                  className="bg-success rounded-full h-2 transition-all duration-300"
+                  style={{
+                    width: `${
+                      (problems.filter((p) => p.solve_status === 'solved').length /
+                        problems.length) *
+                      100
+                    }%`,
+                  }}
+                />
+              </div>
+            </div>
+          </Card>
+        )}
+
         {/* Filters */}
         <Card variant="elevated" padding="md" className="mb-6">
           <div className="flex flex-wrap items-center gap-4">
