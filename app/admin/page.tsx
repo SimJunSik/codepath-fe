@@ -24,6 +24,23 @@ export default function AdminHomePage() {
         },
       });
 
+      if (!response.ok) {
+        // Try to parse error response
+        let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.detail || errorData.message || errorMessage;
+        } catch {
+          // If JSON parsing fails, use default error message
+        }
+
+        setMigrationResult({
+          success: false,
+          message: errorMessage,
+        });
+        return;
+      }
+
       const result = await response.json();
       setMigrationResult(result);
     } catch (error: any) {
