@@ -493,6 +493,17 @@ export default function QuizDetailPage() {
     setRunResult(null);
     setSubmitResult(null);
 
+    // 코드 길이 검증 (악의적인 긴 코드 방지)
+    if (code.length > 5000) {
+      setExecutionError('코드 길이가 너무 깁니다. 5,000자 이하로 작성해주세요.');
+      return;
+    }
+
+    if (code.length === 0) {
+      setExecutionError('코드를 입력해주세요.');
+      return;
+    }
+
     if (!isUuid(quiz.id)) {
       setExecutionError('실행은 실제 문제 데이터에서만 가능합니다. 로그인 후 다시 시도해주세요.');
       return;
@@ -521,6 +532,17 @@ export default function QuizDetailPage() {
 
     setExecutionError(null);
     setSubmitResult(null);
+
+    // 코드 길이 검증 (악의적인 긴 코드 방지, LLM API 비용 보호)
+    if (code.length > 5000) {
+      setExecutionError('코드 길이가 너무 깁니다. 5,000자 이하로 작성해주세요.');
+      return;
+    }
+
+    if (code.length === 0) {
+      setExecutionError('코드를 입력해주세요.');
+      return;
+    }
 
     if (!isUuid(quiz.id)) {
       setExecutionError('제출은 실제 문제 데이터에서만 가능합니다. 로그인 후 다시 시도해주세요.');
