@@ -106,9 +106,22 @@ apiClient.interceptors.response.use(
       const retryAfter = responseData?.retry_after || 10;
       const message = responseData?.detail || `요청이 너무 많습니다. ${retryAfter}초 후에 다시 시도해주세요.`;
 
-      const rateLimitError = new Error(message) as Error & { retryAfter?: number };
+      const rateLimitError = new Error(message) as Error & { retryAfter?: number; status?: number };
       rateLimitError.retryAfter = retryAfter;
+      rateLimitError.status = 429;
       return Promise.reject(rateLimitError);
+    }
+
+    // 403 Forbidden - 권한 없음 (프리미엄 구독 필요 등)
+    if (error.response?.status === 403) {
+      const responseData = error.response?.data as
+        | { detail?: string; message?: string }
+        | undefined;
+      const message = responseData?.detail || responseData?.message || '접근 권한이 없습니다.';
+
+      const forbiddenError = new Error(message) as Error & { status?: number };
+      forbiddenError.status = 403;
+      return Promise.reject(forbiddenError);
     }
 
     // 에러 메시지 추출
@@ -120,7 +133,9 @@ apiClient.interceptors.response.use(
         ? responseData.error.message
         : responseData?.message || responseData?.detail || '알 수 없는 오류가 발생했습니다.';
 
-    return Promise.reject(new Error(errorMessage));
+    const apiError = new Error(errorMessage) as Error & { status?: number };
+    apiError.status = error.response?.status;
+    return Promise.reject(apiError);
   }
 );
 

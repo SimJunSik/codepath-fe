@@ -225,6 +225,7 @@ export default function AdminProblemsPage() {
                   <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">난이도</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">카테고리</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">활성</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">프리미엄</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">액션</th>
                 </tr>
               </thead>
@@ -237,6 +238,15 @@ export default function AdminProblemsPage() {
                     <td className="px-6 py-3 text-sm text-text-secondary">{problem.category}</td>
                     <td className="px-6 py-3 text-sm text-text-secondary">
                       {problem.is_active ? 'Y' : 'N'}
+                    </td>
+                    <td className="px-6 py-3 text-sm">
+                      {problem.is_premium ? (
+                        <span className="px-2 py-1 text-xs font-medium rounded-full bg-warning-bg text-warning border border-warning/30">
+                          PRO
+                        </span>
+                      ) : (
+                        <span className="text-text-tertiary">-</span>
+                      )}
                     </td>
                     <td className="px-6 py-3 text-sm text-text-secondary">
                       <div className="flex gap-2">

@@ -21,6 +21,7 @@ interface Problem {
   successful_submissions: number;
   success_rate: number;
   solve_status?: SolveStatus | null;
+  is_premium?: boolean;
 }
 
 // Fallback mock data (비로그인 또는 API 실패 시)
@@ -329,6 +330,9 @@ export default function ProblemsPage() {
                     <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">
                       제목
                     </th>
+                    <th className="px-4 py-4 text-center text-sm font-semibold text-text-secondary w-20">
+                      유형
+                    </th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-text-secondary">
                       난이도
                     </th>
@@ -369,6 +373,17 @@ export default function ProblemsPage() {
                           >
                             {problem.title}
                           </Link>
+                        </td>
+                        <td className="px-4 py-4 text-center">
+                          {problem.is_premium ? (
+                            <span className="px-2 py-1 text-xs font-medium rounded-full bg-warning-bg text-warning border border-warning/30">
+                              PRO
+                            </span>
+                          ) : (
+                            <span className="px-2 py-1 text-xs font-medium rounded-full bg-bg-hover text-text-tertiary">
+                              FREE
+                            </span>
+                          )}
                         </td>
                         <td className="px-6 py-4">
                           <span

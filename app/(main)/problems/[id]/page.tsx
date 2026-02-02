@@ -10,6 +10,7 @@ import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import MainLayout from '@/components/layouts/MainLayout';
 import { getProblem, runCode, submitCode } from '@/lib/api/problems';
+import { getMySubscription } from '@/lib/api/subscriptions';
 import { useEditorStore } from '@/lib/store/editorStore';
 
 // Monaco Editor는 SSR 비활성화 필요
@@ -29,6 +30,7 @@ interface Quiz {
   test_cases: any[];
   constraints?: string[];
   hints?: string[];
+  is_premium?: boolean;
 }
 
 interface CodeTestResult {
@@ -431,6 +433,7 @@ export default function QuizDetailPage() {
   const [executionError, setExecutionError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [rateLimitCountdown, setRateLimitCountdown] = useState<number | null>(null);
+  const [requiresSubscription, setRequiresSubscription] = useState(false);
 
   const isUuid = (value: string) =>
     /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
@@ -473,9 +476,14 @@ export default function QuizDetailPage() {
         if (apiQuiz) {
           setQuiz(apiQuiz as unknown as Quiz);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Failed to fetch problem from API:', error);
-        setExecutionError('문제 정보를 불러오지 못했습니다.');
+        // 403 에러 = 프리미엄 구독 필요
+        if (error.status === 403 || error.message?.includes('프리미엄')) {
+          setRequiresSubscription(true);
+        } else {
+          setExecutionError('문제 정보를 불러오지 못했습니다.');
+        }
       } finally {
         setLoading(false);
       }
@@ -605,6 +613,30 @@ export default function QuizDetailPage() {
     );
   }
 
+  if (requiresSubscription) {
+    return (
+      <MainLayout>
+        <div className="flex flex-col items-center justify-center h-[calc(100vh-8rem)]">
+          <div className="text-center">
+            <div className="text-6xl mb-4">🔒</div>
+            <h2 className="text-2xl font-bold text-text-primary mb-2">프리미엄 문제입니다</h2>
+            <p className="text-text-secondary mb-6">
+              이 문제는 프리미엄 구독자만 접근할 수 있습니다.
+            </p>
+            <div className="flex gap-4 justify-center">
+              <Link href="/pricing">
+                <Button variant="primary">구독하기</Button>
+              </Link>
+              <Link href="/problems">
+                <Button variant="outline">퀴즈 목록으로</Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </MainLayout>
+    );
+  }
+
   if (!quiz) {
     return (
       <MainLayout>
@@ -687,6 +719,11 @@ export default function QuizDetailPage() {
             </svg>
           </Link>
           <h1 className="text-lg font-bold text-text-primary">{quiz.title}</h1>
+          {quiz.is_premium && (
+            <span className="px-2 py-1 text-xs font-medium rounded-full bg-warning-bg text-warning border border-warning/30">
+              PRO
+            </span>
+          )}
           <span className={`px-3 py-1 text-xs font-medium rounded-full ${difficultyColors[quiz.difficulty]}`}>
             {difficultyLabels[quiz.difficulty]}
           </span>
